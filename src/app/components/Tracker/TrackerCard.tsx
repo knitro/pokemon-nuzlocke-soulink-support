@@ -2,107 +2,135 @@
 
 import {
   Divider,
-  FormControlLabel,
+  IconButton,
   List,
   ListItem,
-  ListItemIcon,
   ListItemText,
-  Switch,
 } from "@mui/material";
-import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
-import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 import Card from "@mui/material/Card";
-import { getLevelCapData } from "./LevelCapsData";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
+import { v4 } from "uuid";
+import CardTitleBar from "../supporting/CardTitleBar";
 
 interface Props {
-  gameName: string;
+  name: string;
 }
 
 interface ListProps {
-  name: string;
-  type: "gym" | "elite four" | "champion";
-  levelCap: number;
+  info: PlayerInfo;
+  stepPlayerCount: (id: string, isIncrement: boolean) => void;
+  updatePlayerName: (id: string, updatedName: string) => void;
 }
 
-export default function LevelCapCard(props: Props) {
-  const levelCapData = getLevelCapData(props.gameName);
-  const gymBattles = levelCapData.slice(0, 8);
-  const eliteFour = levelCapData.slice(8, 12);
-  const championLevelCap = levelCapData[12];
+interface PlayerInfo {
+  id: string;
+  name: string;
+  count: number;
+}
+
+interface TrackerButtonProps {
+  icon: ReactNode;
+  action: () => void;
+  edge: "start" | "end";
+}
+
+export default function TrackerCard(props: Props) {
+  const [players, setPlayers] = useState<PlayerInfo[]>([]);
+
+  const createPlayer = () => {
+    const player: PlayerInfo = {
+      id: v4(),
+      name: "New Player",
+      count: 0,
+    };
+    players.push(player);
+    setPlayers(players);
+  };
+
+  const removePlayer = (id: string) => {
+    players.filter((currentPlayer: PlayerInfo) => {
+      return currentPlayer.id != id;
+    });
+    setPlayers(players);
+  };
+
+  const stepPlayerCount = (id: string, isIncrement: boolean) => {
+    const currentPlayer = players.find(
+      (loopPlayer: PlayerInfo) => loopPlayer.id == id
+    );
+    if (currentPlayer) {
+      const adjustment = isIncrement ? 1 : -1;
+      currentPlayer.count = currentPlayer.count + adjustment;
+      setPlayers(players);
+    }
+  };
+
+  const updatePlayerName = (id: string, updatedName: string) => {
+    const currentPlayer = players.find(
+      (loopPlayer: PlayerInfo) => loopPlayer.id == id
+    );
+    if (currentPlayer) {
+      currentPlayer.name = updatedName;
+      setPlayers(players);
+    }
+  };
 
   return (
     <Card>
+      <CardTitleBar title={props.name} />
       <List>
-        {gymBattles.map((levelCap: number, index: number) => (
+        {players.map((currentPlayer: PlayerInfo) => (
           <div>
-            <LevelCapListItem
-              name={"Gym " + (index + 1)}
-              type="gym"
-              levelCap={levelCap}
+            <TrackerListItem
+              info={currentPlayer}
+              stepPlayerCount={stepPlayerCount}
+              updatePlayerName={updatePlayerName}
             />
             <Divider variant="inset" component="li" />
           </div>
         ))}
-        {eliteFour.map((levelCap: number, index: number) => (
-          <div>
-            <LevelCapListItem
-              name={"Elite Four #" + (index + 1)}
-              type="elite four"
-              levelCap={levelCap}
-            />
-            <Divider variant="inset" component="li" />
-          </div>
-        ))}
-        <LevelCapListItem
-          name="Champion"
-          type="champion"
-          levelCap={championLevelCap}
-        />
       </List>
     </Card>
   );
 }
 
-function LevelCapListItem(props: ListProps) {
-  const name = props.name;
-  const type = props.type;
-  const levelCap = props.levelCap;
-
-  const [strikeout, setStrikeout] = useState(false);
-  const handleToggle = () => setStrikeout(!strikeout);
+function TrackerListItem(props: ListProps) {
+  const playerInfo = props.info;
+  const id = playerInfo.id;
+  const playerName = playerInfo.name;
+  const handleSub = () => props.stepPlayerCount(id, false);
+  const handleAdd = () => props.stepPlayerCount(id, true);
 
   return (
-    <ListItem>
-      <ListItemIcon>
-        {type == "gym" ? (
-          <FitnessCenterIcon />
-        ) : type == "elite four" ? (
-          <MilitaryTechIcon />
-        ) : type == "champion" ? (
-          <EmojiEventsIcon />
-        ) : (
-          <FitnessCenterIcon />
-        )}
-      </ListItemIcon>
-      <ListItemText sx={strikeout ? { textDecoration: "line-through" } : {}}>
-        {name}
-      </ListItemText>
-      <ListItemText></ListItemText>
-      <FormControlLabel
-        labelPlacement="start"
-        control={
-          <Switch edge="end" onChange={handleToggle} checked={strikeout} />
-        }
-        label={
-          <ListItemText
-            sx={strikeout ? { textDecoration: "line-through" } : {}}
-          >
-            {"Lvl " + levelCap}
-          </ListItemText>
-        }
-      ></FormControlLabel>
+    <ListItem
+      // key={value}
+      // secondaryAction={
+      //   <TrackerButton icon={<RemoveIcon />} action={handleSub} edge="start" />
+      // }
+      disablePadding
+    >
+      <TrackerButton icon={<RemoveIcon />} action={handleSub} edge="start" />
+      <ListItemText primary={playerName} />
+      <TrackerButton icon={<AddIcon />} action={handleAdd} edge="end" />
+      {/* <ListItemButton>
+        <ListItemAvatar>
+          <Avatar
+            alt={`Avatar n°${value + 1}`}
+            src={`/static/images/avatar/${value + 1}.jpg`}
+          />
+        </ListItemAvatar>
+        <ListItemText id={labelId} primary={`Line item ${value + 1}`} />
+      </ListItemButton> */}
     </ListItem>
+  );
+}
+
+function TrackerButton(props: TrackerButtonProps) {
+  return (
+    <IconButton color="primary" onClick={props.action} edge={props.edge}>
+      {props.icon}
+    </IconButton>
   );
 }

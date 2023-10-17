@@ -3,7 +3,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 interface Props {
   title: string;
-  subtitle: string;
+  subtitle?: string;
 }
 
 export default function CardTitleBar(props: Props) {

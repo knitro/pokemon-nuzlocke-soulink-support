@@ -43,7 +43,7 @@ export default function LevelCapCard(props: Props) {
       <CardTitleBar title="Level Caps" subtitle={gameNameCapitalised} />
       <List>
         {gymBattles.map((levelCap: number, index: number) => (
-          <div>
+          <div key={"levelCapItemGym-index" + index}>
             <LevelCapListItem
               name={"Gym " + (index + 1)}
               type="gym"
@@ -53,7 +53,7 @@ export default function LevelCapCard(props: Props) {
           </div>
         ))}
         {eliteFour.map((levelCap: number, index: number) => (
-          <div>
+          <div key={"levelCapItemE4-index" + index}>
             <LevelCapListItem
               name={"Elite Four #" + (index + 1)}
               type="elite four"

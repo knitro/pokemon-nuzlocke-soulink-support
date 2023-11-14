@@ -5,6 +5,7 @@ import LevelCapCard from "./components/LevelCapsCard/LevelCapsCard";
 import DeathTrackerCard from "./components/Tracker/DeathTrackerCard";
 import EncounterFailTracker from "./components/Tracker/EncounterFailTrackerCard";
 import PartyTypesCard from "./components/PartyTypesCard/PartyTypesCard";
+import PokeApiCard from "./components/PokeApiCard/PokeApiCard";
 
 export default function Home() {
   return (
@@ -21,7 +22,7 @@ export default function Home() {
           </Grid>
         </Grid>
         <Grid item xs={4}>
-          <LevelCapCard gameName="emerald" />
+          <PokeApiCard generation={3} />
         </Grid>
         <Grid item xs={2}>
           <LevelCapCard gameName="emerald" />

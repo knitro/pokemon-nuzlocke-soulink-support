@@ -6,6 +6,7 @@ import { getTypeArray } from "./PartyTypesData";
 import { useState } from "react";
 import CardTitleBar from "../supporting/CardTitleBar";
 import { PokeType, PokeTypeInfo } from "@/app/data/TypeDataInterface";
+import { capitalise } from "@/app/logic/capitalisation";
 
 interface Props {
   generation: number;
@@ -93,7 +94,7 @@ function PartyTypesListItem(props: ListProps) {
             : { textAlign: "center" }
         }
       >
-        {type}
+        {capitalise(type)}
       </ListItemText>
       <Switch
         edge="end"

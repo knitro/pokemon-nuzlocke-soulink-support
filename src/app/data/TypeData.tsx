@@ -1,10 +1,17 @@
 import { PokeType, PokeTypeInfo } from "./TypeDataInterface";
 
-export const GetPokeTypeData = () => {
-  return [...PokeTypeData];
+export const getPokeTypeInfo = (type: PokeType): PokeTypeInfo | null => {
+  const pokeTypeInfo = pokeTypeData.find(
+    (value: PokeTypeInfo) => value.type === type
+  );
+  return pokeTypeInfo === undefined ? null : pokeTypeInfo;
 };
 
-const PokeTypeData: PokeTypeInfo[] = [
+export const getPokeTypeData = () => {
+  return [...pokeTypeData];
+};
+
+const pokeTypeData: PokeTypeInfo[] = [
   {
     type: PokeType.NORMAL,
     weak: [
@@ -317,7 +324,7 @@ const PokeTypeData: PokeTypeInfo[] = [
     resist: [
       {
         earliestApplicableGeneration: 1,
-        types: [PokeType.FIRE, PokeType.WATER, PokeType.ICE],
+        types: [PokeType.STEEL, PokeType.FIRE, PokeType.WATER, PokeType.ICE],
       },
     ],
     immune: [],

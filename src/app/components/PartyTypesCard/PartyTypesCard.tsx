@@ -7,6 +7,7 @@ import { useState } from "react";
 import CardTitleBar from "../supporting/CardTitleBar";
 import { PokeType, PokeTypeInfo } from "@/app/data/TypeDataInterface";
 import { capitalise } from "@/app/logic/capitalisation";
+import TypeChip from "../TypeChip/TypeChip";
 
 interface Props {
   generation: number;
@@ -14,7 +15,8 @@ interface Props {
 }
 
 interface ListProps {
-  type: string;
+  type: PokeType;
+  colour: string;
   bothPlayers: boolean;
 }
 
@@ -29,6 +31,7 @@ export default function PartyTypesCard(props: Props) {
           <div key={"partyTypeList-index" + index}>
             <PartyTypesListItem
               type={typeInfo.type}
+              colour={typeInfo.colour}
               bothPlayers={
                 typeInfo.type == PokeType.WATER && props.allowDualWater
                   ? true
@@ -46,6 +49,7 @@ export default function PartyTypesCard(props: Props) {
 function PartyTypesListItem(props: ListProps) {
   const type = props.type;
   const bothPlayers = props.bothPlayers;
+  const colour = props.colour;
 
   const [playerOneCheck, setPlayerOneCheck] = useState(false);
   const [playerTwoCheck, setPlayerTwoCheck] = useState(false);
@@ -86,21 +90,25 @@ function PartyTypesListItem(props: ListProps) {
         onChange={handleTogglePlayerOne}
         checked={playerOneCheck}
         disabled={playerTwoCheck && !bothPlayers}
+        sx={{
+          "&.MuiSwitch-root .Mui-checked": {
+            color: colour,
+          },
+        }}
       />
-      <ListItemText
-        sx={
-          strikeout
-            ? { textAlign: "center", textDecoration: "line-through" }
-            : { textAlign: "center" }
-        }
-      >
-        {capitalise(type)}
+      <ListItemText sx={{ textAlign: "center" }}>
+        <TypeChip type={type} isCrossedOut={strikeout} />
       </ListItemText>
       <Switch
         edge="end"
         onChange={handleTogglePlayerTwo}
         checked={playerTwoCheck}
         disabled={playerOneCheck && !bothPlayers}
+        sx={{
+          "&.MuiSwitch-root .Mui-checked": {
+            color: colour,
+          },
+        }}
       />
     </ListItem>
   );

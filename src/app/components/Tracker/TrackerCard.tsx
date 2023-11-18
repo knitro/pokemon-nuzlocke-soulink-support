@@ -17,9 +17,11 @@ import Card from "@mui/material/Card";
 import { ReactNode, useState } from "react";
 import { v4 } from "uuid";
 import CardTitleBar from "../supporting/CardTitleBar";
+import { saveToStorage } from "@/app/storage/browserStorage";
 
 interface Props {
   name: string;
+  id: string;
 }
 
 interface ListProps {
@@ -31,6 +33,7 @@ interface ListProps {
 interface PlayerInfo {
   id: string;
   name: string;
+  measurement: string;
   count: number;
 }
 
@@ -39,33 +42,45 @@ interface TrackerButtonProps {
   action: () => void;
 }
 
-const defaultPlayers = [
-  {
-    id: v4(),
-    name: "Player 1",
-    count: 0,
-  },
-  {
-    id: v4(),
-    name: "Player 2",
-    count: 0,
-  },
-];
-
 export default function TrackerCard(props: Props) {
   const name = props.name;
+  const id = props.id;
 
-  const [players, setPlayers] = useState<PlayerInfo[]>(defaultPlayers);
+  const createDefaultPlayers = () => {
+    const list = [
+      {
+        id: v4(),
+        name: "Player 1",
+        measurement: id,
+        count: 0,
+      },
+      {
+        id: v4(),
+        name: "Player 2",
+        measurement: id,
+        count: 0,
+      },
+    ];
+    return list;
+  };
+
+  const [players, setPlayers] = useState<PlayerInfo[]>(createDefaultPlayers());
+
+  const updateData = (updatedData: PlayerInfo[]) => {
+    saveToStorage<PlayerInfo[]>(id + "-players", updatedData);
+    setPlayers(updatedData);
+  };
 
   const createPlayer = () => {
     const listCopy = [...players];
     const player: PlayerInfo = {
       id: v4(),
-      name: "New Player",
+      name: "Player " + listCopy.length,
+      measurement: id,
       count: 0,
     };
     listCopy.push(player);
-    setPlayers(listCopy);
+    updateData(listCopy);
   };
 
   const removePlayer = (id: string) => {
@@ -73,7 +88,7 @@ export default function TrackerCard(props: Props) {
     listCopy.filter((currentPlayer: PlayerInfo) => {
       return currentPlayer.id != id;
     });
-    setPlayers(listCopy);
+    updateData(listCopy);
   };
 
   const stepPlayerCount = (id: string, isIncrement: boolean) => {
@@ -87,7 +102,7 @@ export default function TrackerCard(props: Props) {
       if (currentPlayer.count < 0) {
         currentPlayer.count = 0;
       }
-      setPlayers(listCopy);
+      updateData(listCopy);
     }
   };
 
@@ -98,7 +113,7 @@ export default function TrackerCard(props: Props) {
     );
     if (currentPlayer) {
       currentPlayer.name = updatedName;
-      setPlayers(listCopy);
+      updateData(listCopy);
     }
   };
 
@@ -106,7 +121,7 @@ export default function TrackerCard(props: Props) {
     <Card>
       <CardTitleBar title={props.name} />
       {players.map((currentPlayer: PlayerInfo) => (
-        <div key={"trackerCard-" + name + "-" + currentPlayer.id}>
+        <div key={"trackerCard-" + id + "-" + name + "-" + currentPlayer.id}>
           <TrackerListItem
             info={currentPlayer}
             stepPlayerCount={stepPlayerCount}

@@ -6,7 +6,6 @@ import { getTypeArray } from "./PartyTypesData";
 import { useState } from "react";
 import CardTitleBar from "../supporting/CardTitleBar";
 import { PokeType, PokeTypeInfo } from "@/app/data/TypeDataInterface";
-import { capitalise } from "@/app/logic/capitalisation";
 import TypeChip from "../TypeChip/TypeChip";
 
 interface Props {
@@ -25,7 +24,10 @@ export default function PartyTypesCard(props: Props) {
 
   return (
     <Card>
-      <CardTitleBar title="Party Types" />
+      <CardTitleBar
+        title="Party Types"
+        subtitle={"Generation " + props.generation}
+      />
       <List dense>
         {typeData.map((typeInfo: PokeTypeInfo, index: number) => (
           <div key={"partyTypeList-index" + index}>

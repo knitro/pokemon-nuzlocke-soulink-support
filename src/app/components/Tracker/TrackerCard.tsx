@@ -17,7 +17,7 @@ import Card from "@mui/material/Card";
 import { ReactNode, useState } from "react";
 import { v4 } from "uuid";
 import CardTitleBar from "../supporting/CardTitleBar";
-import { saveToStorage } from "@/app/storage/browserStorage";
+import { getFromStorage, saveToStorage } from "@/app/storage/browserStorage";
 
 interface Props {
   name: string;
@@ -45,6 +45,18 @@ interface TrackerButtonProps {
 export default function TrackerCard(props: Props) {
   const name = props.name;
   const id = props.id;
+  const storageKey = id + "-players";
+
+  const setStartingAmounts = () => {
+    const storedValues: PlayerInfo[] | null =
+      getFromStorage<PlayerInfo[]>(storageKey);
+    if (storedValues === null) {
+      return createDefaultPlayers();
+    } else {
+      console.log(storedValues);
+      return storedValues;
+    }
+  };
 
   const createDefaultPlayers = () => {
     const list = [
@@ -64,10 +76,10 @@ export default function TrackerCard(props: Props) {
     return list;
   };
 
-  const [players, setPlayers] = useState<PlayerInfo[]>(createDefaultPlayers());
+  const [players, setPlayers] = useState<PlayerInfo[]>(setStartingAmounts());
 
   const updateData = (updatedData: PlayerInfo[]) => {
-    saveToStorage<PlayerInfo[]>(id + "-players", updatedData);
+    saveToStorage<PlayerInfo[]>(storageKey, updatedData);
     setPlayers(updatedData);
   };
 

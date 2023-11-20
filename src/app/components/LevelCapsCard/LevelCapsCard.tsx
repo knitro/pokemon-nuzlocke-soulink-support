@@ -16,6 +16,7 @@ import Card from "@mui/material/Card";
 import { getLevelCapData } from "./LevelCapsData";
 import { useState } from "react";
 import CardTitleBar from "../supporting/CardTitleBar";
+import { getFromStorage, saveToStorage } from "@/app/storage/browserStorage";
 
 interface Props {
   gameName: string;
@@ -76,9 +77,26 @@ function LevelCapListItem(props: ListProps) {
   const name = props.name;
   const type = props.type;
   const levelCap = props.levelCap;
+  const storageKey = "level-caps-" + name;
 
-  const [strikeout, setStrikeout] = useState(false);
-  const handleToggle = () => setStrikeout(!strikeout);
+  const getDefaultStrikeoutValue = () => {
+    const storedValue = getFromStorage<boolean>(storageKey);
+    if (storedValue == null) {
+      return false;
+    } else {
+      return storedValue;
+    }
+  };
+
+  const [strikeout, setStrikeout] = useState<boolean>(
+    getDefaultStrikeoutValue()
+  );
+
+  const handleToggle = () => {
+    const valueToSet = !strikeout;
+    setStrikeout(valueToSet);
+    saveToStorage<boolean>(storageKey, valueToSet);
+  };
 
   return (
     <ListItem>

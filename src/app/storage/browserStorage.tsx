@@ -13,9 +13,13 @@ export function saveToStorage<T>(key: string, info: T) {
  * @param key - the key that the info was stored at
  * @returns the instance as a T
  */
-export function getFromStorage<T>(key: string): T {
+export function getFromStorage<T>(key: string): T | null {
   const storedJsonString = localStorage.getItem(key);
-  return storedJsonString as T;
+  if (storedJsonString === null) {
+    return null;
+  }
+  const parsedStore = JSON.parse(storedJsonString);
+  return parsedStore as T;
 }
 
 export function clearKeyFromStorage(key: string) {

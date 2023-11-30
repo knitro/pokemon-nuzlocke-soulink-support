@@ -232,6 +232,7 @@ function extractLevelMoves(
   const returnArray: PokeMove[] = [];
 
   pokemonMoves.forEach((move: PokemonMove) => {
+    // Consider only moves from the expected generation
     const relatedMoveVersion = move.version_group_details.find(
       (versionDetail: PokemonMoveVersion) => {
         const gameVersion = versionDetail.version_group.name;
@@ -244,11 +245,26 @@ function extractLevelMoves(
       return;
     }
 
+    // Consider only moves that are obtained from leveling up
+    if (relatedMoveVersion.move_learn_method.name !== "level-up") {
+      return;
+    }
     const returnItem: PokeMove = {
       name: move.move.name,
       level: relatedMoveVersion.level_learned_at,
     };
     returnArray.push(returnItem);
+  });
+
+  // Sort array based on level
+  returnArray.sort((a: PokeMove, b: PokeMove) => {
+    if (a.level > b.level) {
+      return 1;
+    } else if (a.level < b.level) {
+      return -1;
+    } else {
+      return 0;
+    }
   });
 
   return returnArray;

@@ -2,11 +2,21 @@
 
 import Card from "@mui/material/Card";
 import CardTitleBar from "../supporting/CardTitleBar";
-import { CardContent, CardHeader, Grid, Stack, TextField } from "@mui/material";
+import {
+  CardContent,
+  CardHeader,
+  Grid,
+  ListItem,
+  ListItemText,
+  Stack,
+  TextField,
+} from "@mui/material";
 import { useState } from "react";
 import {
   PokeApiDisplayInformation,
   PokeEvolutionChainSingle,
+  PokeMove,
+  PokeStat,
 } from "./PokeApiInterfaces";
 import { capitalise } from "@/app/logic/capitalisation";
 import { pokemonSearch } from "@/app/logic/PokemonApiSearch";
@@ -146,8 +156,27 @@ export default function PokeApiCard(props: Props) {
           </CardContent>
         </Card>
         <Card>
+          <CardHeader subheader="Stats"></CardHeader>
+          <CardContent>
+            {displayInfo?.stats.map((currentStat: PokeStat) => (
+              <ListItem key={displayInfo.name + "-" + currentStat.name}>
+                <ListItemText>{currentStat.name}</ListItemText>
+                <ListItemText>{currentStat.value}</ListItemText>
+              </ListItem>
+            ))}
+          </CardContent>
+        </Card>
+        <Card>
           <CardHeader subheader="Move Set"></CardHeader>
         </Card>
+        <CardContent>
+          {displayInfo?.levelMoves.map((currentMove: PokeMove) => (
+            <ListItem key={displayInfo.name + "-" + currentMove.name} dense>
+              <ListItemText>{currentMove.name}</ListItemText>
+              <ListItemText>{currentMove.level}</ListItemText>
+            </ListItem>
+          ))}
+        </CardContent>
       </CardContent>
     </Card>
   );

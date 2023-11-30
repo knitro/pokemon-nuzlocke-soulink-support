@@ -4,22 +4,27 @@ import {
   EvolutionDetail,
   Pokemon,
   PokemonClient,
+  PokemonMove,
+  PokemonMoveVersion,
   PokemonSpecies,
+  PokemonStat,
 } from "pokenode-ts";
 import {
   PokeApiDisplayInformation,
   PokeEvolutionChainSingle,
+  PokeMove,
+  PokeStat,
 } from "../components/PokeApiCard/PokeApiInterfaces";
 import getDefending, { getTypeBasedOnGeneration } from "./DefenderCalculator";
 import axios from "axios";
 import { capitalise } from "./capitalisation";
+import { getGenerationFromGames } from "./gamesAndGeneration";
 
 export async function pokemonSearch(
   searchTerm: string,
   generation: number
 ): Promise<PokeApiDisplayInformation | null> {
   const api = new PokemonClient(); // create a PokemonClient
-
   const pokemonData = await api
     .getPokemonByName(searchTerm)
     .then((data: Pokemon) => data)
@@ -27,7 +32,6 @@ export async function pokemonSearch(
       console.error(error);
       return null;
     });
-
   if (pokemonData == null) {
     return null;
   }
@@ -39,9 +43,30 @@ export async function pokemonSearch(
   );
   const defense = getDefending(types, generation);
 
-  // Get Evolution Chain
+  const evolutionData = await getEvolutionChain(api, pokemonData.name);
+  if (evolutionData === null) {
+    return null;
+  }
+
+  const stats = extractStats(pokemonData);
+  const moves = extractLevelMoves(pokemonData.moves, generation);
+
+  const updatedValue: PokeApiDisplayInformation = {
+    name: pokemonData.name,
+    defaultImageUrl: pokemonData.sprites.front_default,
+    femaleImageUrl: pokemonData.sprites.front_female,
+    types: types,
+    defense: defense,
+    evolutionChain: evolutionData,
+    stats: stats,
+    levelMoves: moves,
+  };
+  return updatedValue;
+}
+
+async function getEvolutionChain(api: PokemonClient, pokemonName: string) {
   const evolutionUrl = await api
-    .getPokemonSpeciesByName(pokemonData.name)
+    .getPokemonSpeciesByName(pokemonName)
     .then((data: PokemonSpecies) => data.evolution_chain.url)
     .catch((error) => {
       console.error(error);
@@ -92,15 +117,7 @@ export async function pokemonSearch(
     return returnArray;
   });
 
-  const updatedValue: PokeApiDisplayInformation = {
-    name: pokemonData.name,
-    defaultImageUrl: pokemonData.sprites.front_default,
-    femaleImageUrl: pokemonData.sprites.front_female,
-    types: types,
-    defense: defense,
-    evolutionChain: evolutionData,
-  };
-  return updatedValue;
+  return evolutionData;
 }
 
 function getEvolutionDetails(details: EvolutionDetail[]): {
@@ -178,4 +195,61 @@ function getEvolutionDetails(details: EvolutionDetail[]): {
     details: detailsArray.join(", "),
     genderFemaleEvo: genderFemaleEvo,
   };
+}
+
+function extractStats(pokemonData: Pokemon): PokeStat[] {
+  // Add base stats
+  const returnArray: PokeStat[] = pokemonData.stats.map(
+    (pokemonStat: PokemonStat) => {
+      const returnStat: PokeStat = {
+        name: pokemonStat.stat.name,
+        value: pokemonStat.base_stat,
+        ev: pokemonStat.effort,
+      };
+      return returnStat;
+    }
+  );
+
+  // Add misc stats
+  const height: PokeStat = {
+    name: "height",
+    value: pokemonData.height,
+  };
+  returnArray.push(height);
+  const weight: PokeStat = {
+    name: "weight",
+    value: pokemonData.weight,
+  };
+  returnArray.push(weight);
+
+  return returnArray;
+}
+
+function extractLevelMoves(
+  pokemonMoves: PokemonMove[],
+  generation: number
+): PokeMove[] {
+  const returnArray: PokeMove[] = [];
+
+  pokemonMoves.forEach((move: PokemonMove) => {
+    const relatedMoveVersion = move.version_group_details.find(
+      (versionDetail: PokemonMoveVersion) => {
+        const gameVersion = versionDetail.version_group.name;
+        const currentGeneration = getGenerationFromGames(gameVersion);
+        return currentGeneration == generation;
+      }
+    );
+
+    if (relatedMoveVersion === undefined) {
+      return;
+    }
+
+    const returnItem: PokeMove = {
+      name: move.move.name,
+      level: relatedMoveVersion.level_learned_at,
+    };
+    returnArray.push(returnItem);
+  });
+
+  return returnArray;
 }

@@ -7,6 +7,8 @@ export interface PokeApiDisplayInformation {
   types: PokeType[];
   defense: PokeDefense;
   evolutionChain: PokeEvolutionChainSingle[];
+  stats: PokeStat[];
+  levelMoves: PokeMove[];
 }
 
 export interface PokeDefense {
@@ -22,4 +24,15 @@ export interface PokeEvolutionChainSingle {
   imageUrl: string;
   condition: string;
   previousEvoName: string;
+}
+
+export interface PokeStat {
+  name: string;
+  value: number;
+  ev?: number;
+}
+
+export interface PokeMove {
+  name: string;
+  level: number;
 }

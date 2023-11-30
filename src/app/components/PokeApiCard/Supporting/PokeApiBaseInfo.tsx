@@ -21,7 +21,6 @@ export default function PokeApiBaseInfo(props: Props) {
 
   return (
     <Card>
-      <CardHeader subheader="Base Info"></CardHeader>
       <CardContent>
         <Grid container spacing={2}>
           <Grid item xs={4}>

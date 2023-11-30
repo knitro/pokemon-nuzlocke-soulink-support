@@ -3,6 +3,7 @@
 import { CardContent, CardHeader, ListItem, ListItemText } from "@mui/material";
 import Card from "@mui/material/Card";
 import { PokeStat } from "../PokeApiInterfaces";
+import { capitalise } from "@/app/logic/capitalisation";
 
 interface Props {
   name: string;
@@ -15,11 +16,10 @@ export default function PokeApiStats(props: Props) {
 
   return (
     <Card>
-      <CardHeader subheader="Stats"></CardHeader>
       <CardContent>
         {stats.map((currentStat: PokeStat) => (
           <ListItem key={pokemonName + "-" + currentStat.name}>
-            <ListItemText>{currentStat.name}</ListItemText>
+            <ListItemText>{capitalise(currentStat.name)}</ListItemText>
             <ListItemText>{currentStat.value}</ListItemText>
           </ListItem>
         ))}

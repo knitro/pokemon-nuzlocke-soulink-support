@@ -14,7 +14,6 @@ export default function PokeApiEvolution(props: Props) {
 
   return (
     <Card>
-      <CardHeader subheader="Evolution Chain"></CardHeader>
       <CardContent>
         <Grid container>
           {evolutionChain.map((singleEvolution: PokeEvolutionChainSingle) => {

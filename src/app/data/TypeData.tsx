@@ -109,12 +109,7 @@ const pokeTypeData: PokeTypeInfo[] = [
         ],
       },
     ],
-    immune: [
-      {
-        earliestApplicableGeneration: 1,
-        types: [PokeType.GROUND],
-      },
-    ],
+    immune: [],
     colour: "#A040A0",
     startingGeneration: 1,
   },

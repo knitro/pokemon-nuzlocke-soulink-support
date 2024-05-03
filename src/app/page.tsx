@@ -8,12 +8,15 @@ import PartyTypesCard from "./components/PartyTypesCard/PartyTypesCard";
 import PokeApiCard from "./components/PokeApiCard/PokeApiCard";
 
 export default function Home() {
+  const generation = 4;
+  const gameName = "platinum";
+
   return (
     <div>
       <NavBar />
       <Grid container spacing={2}>
         <Grid container item xs={4}>
-          <TypeChartCard generation={3} />
+          <TypeChartCard generation={generation} />
           <Grid item xs={6}>
             <EncounterFailTracker />
           </Grid>
@@ -22,13 +25,13 @@ export default function Home() {
           </Grid>
         </Grid>
         <Grid item xs={4}>
-          <PokeApiCard generation={3} />
+          <PokeApiCard generation={generation} />
         </Grid>
         <Grid item xs={2}>
-          <LevelCapCard gameName="emerald" />
+          <LevelCapCard gameName={gameName} />
         </Grid>
         <Grid item xs={2}>
-          <PartyTypesCard generation={3} allowDualWater />
+          <PartyTypesCard generation={generation} allowDualWater />
         </Grid>
       </Grid>
     </div>
